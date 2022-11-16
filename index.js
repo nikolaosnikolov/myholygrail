@@ -37,19 +37,26 @@ app.get("/data", (req, res) => {
         .catch(err => console.log(err))
 });
 
-app.get("/update/:key/:value", function (req, res) {
+
+app.get("/update/:key/:value", (req, res) => {
+
     const key = req.params.key;
-    let value = Number(req.params.value);
-    client.get(key, function (err, reply) {
-        value = Number(reply) + value;
-        client.set(key, value);
-        
-        data().then((data) => {
-            console.log(data);
-            res.send(data);
-        });
-    });
+    const value = Number(req.params.value);
+    client.get(key)
+        .then(async (result) => {
+            const newValue = Number(result) + value;
+            await client.set(key, newValue);
+            data()
+                .then(data => {
+                    console.log(data);
+                    res.send(data);
+                })
+                .catch(err => console.log(err))
+        })
+        .catch(err => console.log(err))
+
 });
+
 
 app.listen(3000, () => {
     console.log("Running on 3000");
